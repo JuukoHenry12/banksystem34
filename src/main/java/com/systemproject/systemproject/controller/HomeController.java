@@ -1,6 +1,4 @@
-package com.systemproject.controller;
-
-
+package com.systemproject.systemproject.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
