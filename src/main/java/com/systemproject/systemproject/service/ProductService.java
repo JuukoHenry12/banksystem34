@@ -1,59 +1,47 @@
 package com.systemproject.systemproject.service;
+import java.io.IOException;
+import java.security.PublicKey;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Arrays;
+import org.springframework.web.multipart.MultipartFile;
 import com.systemproject.systemproject.model.Product;
-
+import com.systemproject.systemproject.repository.ProductRespo;
 
 @Service
 public class ProductService {
-
-    List <Product> products = Arrays.asList(
-        new Product(012,"Nike Shoes",145000),
-        new Product(034,"water proof bag",50000),
-        new Product(056,"Apple Watch",200000),
-        new Product(002,"Samsung TV",800000),
-        new Product(003,"Sony Headphones",30000)
-
-    );
+    @Autowired
+    private  ProductRespo productRespo;
     
     public List<Product>getProduct(){
-        return products;
-
+        return productRespo.findAll();
     }
 
-    public Product getProductById(int id) {
-        return products.stream()
-        .filter(product -> product.getProdId() == id)
-        .findFirst()
-        .orElse(null);
+    public Product getProduct(int id) {
+        return productRespo.findById(id).orElse(null);
     }
 
-    public void addProduct(Product product) {
-        products.add(product);
-
+    public Product addProduct(Product product,MultipartFile imageFile)  throws IOException{
+        product.setImageName(imageFile.getOriginalFilename());
+        product.setImageType(imageFile.getContentType());
+        product.setImageData(imageFile.getBytes());
+        return productRespo.save(product);
     }
 
-    public void updateProduct(Product prod){
+    public Product updateProduct(int  id ,Product product,MultipartFile imagFile) throws IOException{
 
-        int index =0;
+        product.setImageName(imagFile.getOriginalFilename());
+        product.setImageType(imagFile.getContentType());
+        product.setImageData(imagFile.getBytes());
 
-        for(int i =0 ; i<products.size();i++){
-            if(products.get(i).getProdId() == prod.getProdId()){
-                index=i;
-                products.set(index, prod);
-            }
-        }
+        return productRespo.save(product);
     }
 
-    public void deleteProduct(int prodId){
-        int index =0;
-        
-        for(int i =0 ; i<products.size();i++){
-            if(products.get(i).getProdId() == prodId){
-                index=i;
-                products.remove(index);
-            }
-        }
+    public void deleteProduct(int id){
+        productRespo.deleteById(id);
+    }
+
+    public List<Product>searchProducts(String keyword){
+        return productRespo.searchProducts(keyword);
     }
 }
